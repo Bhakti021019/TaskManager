@@ -30,11 +30,11 @@ export default function Sidebar({ userProfile, isLoggedIn, handleLogout }) {
 
       {isLoggedIn && (
         <div className="mt-10 pt-6 border-t border-gray-200 flex items-center gap-4 p-2 rounded">
-          <img
+          {/* <img
             src={userProfile.profilePicture || '/default-avatar.png'}
             alt="User avatar"
             className="w-14 h-14 rounded-full object-cover"
-          />
+          /> */}
           <div>
             <p className="text-lg font-bold text-gray-800">{userProfile.username}</p>
             <p className="text-sm text-gray-500">{userProfile.role}</p>

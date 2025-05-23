@@ -1,5 +1,3 @@
-
-
 'use client';
 import { useEffect, useState } from 'react';
 
@@ -93,13 +91,13 @@ export default function ProfilePage() {
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block font-medium">Profile Picture</label>
           {userData.profilePicture && (
             <img src={userData.profilePicture} alt="Profile" className="w-24 h-24 rounded-full mb-2" />
           )}
           <input type="file" onChange={handleProfilePicChange} />
-        </div>
+        </div> */}
 
         <button
           onClick={handleSubmit}
