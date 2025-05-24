@@ -215,12 +215,10 @@
 
 
 
-
-
-
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Sidebar from '../app/components/Sidebar';
 
 export default function Page() {
   const [tasks, setTasks] = useState([]);
@@ -307,8 +305,6 @@ export default function Page() {
     }
   };
 
-  const handleSignIn = () => router.push('/signin');
-  const handleSignUp = () => router.push('/signup');
   const handleLogout = () => {
     localStorage.clear();
     setIsLoggedIn(false);
@@ -318,47 +314,8 @@ export default function Page() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="md:w-72 bg-white shadow-md flex flex-col justify-between p-6 md:min-h-screen">
-        <div>
-          <h1 className="text-3xl font-extrabold text-purple-600 mb-10">TickIt</h1>
-          <nav className="flex flex-col gap-5 text-gray-700 font-medium">
-            {isLoggedIn ? (
-              <>
-                <button onClick={() => router.push('/tasks/create')} className="text-left hover:text-purple-600">+ Create Task</button>
-                <button onClick={() => router.push('/academics')} className="text-left hover:text-purple-600">🎓 Academics</button>
-                <button onClick={() => router.push('/experience')} className="text-left hover:text-purple-600">💼 Experience</button>
-                <button onClick={() => router.push('/skills')} className="text-left hover:text-purple-600">🛠️ Skills</button>
-              </>
-            ) : (
-              <>
-                <button onClick={handleSignIn} className="text-left hover:text-purple-600">Sign In</button>
-                <button onClick={handleSignUp} className="text-left hover:text-purple-600">Sign Up</button>
-              </>
-            )}
-            {isLoggedIn && (
-              <button onClick={handleLogout} className="text-left text-red-500 hover:text-red-600">Logout</button>
-            )}
-          </nav>
-        </div>
+      <Sidebar userProfile={userProfile} isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
 
-        {isLoggedIn && (
-          <div className="mt-10 pt-6 border-t border-gray-200 flex items-center gap-4 p-2 rounded">
-            <img
-              src={userProfile.profilePicture || '/default-avatar.png'}
-              alt="User avatar"
-              className="w-14 h-14 rounded-full object-cover"
-            />
-            <div>
-              <p className="text-lg font-bold text-gray-800">{userProfile.username}</p>
-              <p className="text-sm text-gray-500">{userProfile.role}</p>
-              <p className="text-xs text-gray-400">{userProfile.email}</p>
-            </div>
-          </div>
-        )}
-      </aside>
-
-      {/* Main Content */}
       <main className="flex-1 p-6 md:p-10">
         {isLoggedIn ? (
           <>
@@ -424,8 +381,3 @@ export default function Page() {
     </div>
   );
 }
-
-
-
-
-

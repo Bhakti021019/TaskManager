@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState({
@@ -49,6 +50,7 @@ export default function ProfilePage() {
       if (res.ok) alert('Profile updated!');
       else alert('Failed to update profile.');
     } catch (err) {
+      console.error(err); // ✅ Now using `err`
       alert('Server error');
     }
   };
@@ -91,13 +93,20 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* <div>
+        <div>
           <label className="block font-medium">Profile Picture</label>
           {userData.profilePicture && (
-            <img src={userData.profilePicture} alt="Profile" className="w-24 h-24 rounded-full mb-2" />
+            <div className="mb-2 relative w-24 h-24">
+              <Image
+                src={userData.profilePicture}
+                alt="Profile"
+                className="rounded-full object-cover"
+                fill
+              />
+            </div>
           )}
           <input type="file" onChange={handleProfilePicChange} />
-        </div> */}
+        </div>
 
         <button
           onClick={handleSubmit}
@@ -109,10 +118,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-
-
-
-
-
-

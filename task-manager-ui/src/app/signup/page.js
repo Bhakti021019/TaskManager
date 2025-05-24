@@ -153,7 +153,8 @@ export default function SignupPage() {
       } else {
         setError(data.error || 'Failed to register');
       }
-    } catch {
+    } catch (err) {
+      console.error(err); // ✅ Now using the error
       setError('Something went wrong. Please try again.');
     }
   };
@@ -221,8 +222,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-
-
-
-
