@@ -7,23 +7,39 @@ export default function SigninPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const res = await fetch('http://localhost:5000/api/users/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('username', data.username);
-      router.push('/');
-    } else {
-      setError(data.error || 'Failed to login');
+
+    try {
+      const res = await fetch('http://localhost:5000/api/users/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Store user info in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.user.username);
+        localStorage.setItem('userId', data.user._id); // Store userId
+        localStorage.setItem('role', data.user.role); // Store user role
+        localStorage.setItem('email', data.user.email); // Optional: store email
+
+        // ✅ Redirect to dashboard (home page)
+        router.push('/');
+      } else {
+        setError(data.error || 'Failed to login');
+      }
+    } catch (err) {
+      console.error('Signin error:', err);
+      setError('Something went wrong');
     }
   };
 
@@ -56,8 +72,15 @@ export default function SigninPage() {
             Sign In
           </button>
         </form>
-        {error && <div className="text-red-500 mt-4 text-sm text-center">{error}</div>}
+        {error && (
+          <div className="text-red-500 mt-4 text-sm text-center">{error}</div>
+        )}
       </div>
     </div>
   );
 }
+
+
+
+
+

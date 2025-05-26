@@ -1,9 +1,14 @@
 const express = require('express');
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const userController = require('../controllers/userController');
 
-const JWT_SECRET = 'YourSuperSecretKey'; // Move to .env for production
+const JWT_SECRET = 'YourSuperSecretKey'; // 🔒 Move this to .env in production
+
+// ---------------------------
+// Auth Routes
+// ---------------------------
 
 // Sign Up
 router.post('/signup', async (req, res) => {
@@ -22,7 +27,15 @@ router.post('/signup', async (req, res) => {
     const user = new User({ username, password, email, role });
     await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -56,9 +69,12 @@ router.post('/signin', async (req, res) => {
 
     res.json({
       token,
-      username: user.username,
-      email: user.email,
-      role: user.role,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     console.error('Signin error:', err);
@@ -66,4 +82,15 @@ router.post('/signin', async (req, res) => {
   }
 });
 
+// ---------------------------
+// Profile Routes
+// ---------------------------
+router.get('/:id', userController.getProfile);
+router.put('/:id', userController.updateProfile);
+
 module.exports = router;
+
+
+
+
+

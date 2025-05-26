@@ -76,6 +76,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/experience', experienceRoutes);
 app.use('/api/academics', academicsRoutes);
 app.use('/api/skills', skillRoutes);
+app.use('/api/users', require('./routes/userRoutes'));
 
 // MongoDB
 const mongoUri = process.env.MONGODB_URI;

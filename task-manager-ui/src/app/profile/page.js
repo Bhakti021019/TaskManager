@@ -1,120 +1,93 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 export default function ProfilePage() {
-  const [userData, setUserData] = useState({
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState({
+    username: '',
     email: '',
-    phone: '',
     role: '',
-    profilePicture: '',
+    profilePicture: ''
   });
-  const [username, setUsername] = useState('');
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
-      fetch(`http://localhost:5000/api/users/${storedUsername}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data) {
-            setUserData(data);
-          }
-        });
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      axios.get(`http://localhost:5000/api/users/${userId}`)
+        .then(res => {
+          setUser(res.data);
+          setFormData({
+            username: res.data.username || '',
+            email: res.data.email || '',
+            role: res.data.role || '',
+            profilePicture: res.data.profilePicture || ''
+          });
+        })
+        .catch(err => console.error('Failed to fetch user profile:', err));
     }
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleProfilePicChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUserData((prev) => ({ ...prev, profilePicture: reader.result }));
-    };
-    reader.readAsDataURL(file);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const userId = localStorage.getItem('userId');
 
-  const handleSubmit = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${username}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
-      if (res.ok) alert('Profile updated!');
-      else alert('Failed to update profile.');
+      await axios.put(`http://localhost:5000/api/users/${userId}`, formData);
+      alert('Profile updated successfully!');
     } catch (err) {
-      console.error(err); // ✅ Now using `err`
-      alert('Server error');
+      console.error('Error updating profile:', err);
+      alert('Failed to update profile.');
     }
   };
 
-  return (
-    <div className="p-10 max-w-xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Edit Profile</h2>
+  if (!user) return <p className="p-4">Loading profile...</p>;
 
-      <div className="space-y-4">
+  return (
+    <div className="p-6 bg-white rounded shadow max-w-lg mx-auto mt-10">
+      <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="w-full p-2 border rounded"
-            value={userData.email}
-            onChange={handleChange}
-          />
+          <label className="block font-medium">Username</label>
+          <input type="text" name="username" value={formData.username} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
 
         <div>
-          <label className="block font-medium">Phone</label>
-          <input
-            type="tel"
-            name="phone"
-            className="w-full p-2 border rounded"
-            value={userData.phone}
-            onChange={handleChange}
-          />
+          <label className="block font-medium">Email</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
 
         <div>
           <label className="block font-medium">Role</label>
-          <input
-            type="text"
-            name="role"
-            className="w-full p-2 border rounded"
-            value={userData.role}
-            onChange={handleChange}
-          />
+          <input type="text" name="role" value={formData.role} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
 
         <div>
-          <label className="block font-medium">Profile Picture</label>
-          {userData.profilePicture && (
-            <div className="mb-2 relative w-24 h-24">
-              <Image
-                src={userData.profilePicture}
-                alt="Profile"
-                className="rounded-full object-cover"
-                fill
-              />
-            </div>
-          )}
-          <input type="file" onChange={handleProfilePicChange} />
+          <label className="block font-medium">Profile Picture URL</label>
+          <input type="text" name="profilePicture" value={formData.profilePicture} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
 
-        <button
-          onClick={handleSubmit}
-          className="mt-4 bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"
-        >
-          Save Changes
-        </button>
-      </div>
+        {formData.profilePicture && (
+          <div className="mt-2">
+            <p className="text-sm text-gray-600">Preview:</p>
+            <img src={formData.profilePicture} alt="Preview" className="w-20 h-20 object-cover rounded-full" />
+          </div>
+        )}
+
+        <div className="flex justify-between mt-6">
+          <button type="button" onClick={() => router.push('/')} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">← Back to Home</button>
+          <button type="submit" className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">💾 Save Changes</button>
+        </div>
+      </form>
     </div>
   );
 }
+
